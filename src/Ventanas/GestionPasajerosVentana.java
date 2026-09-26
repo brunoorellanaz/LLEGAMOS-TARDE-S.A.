@@ -160,14 +160,42 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_deletePasajeroActionPerformed
 
     private void addPasajeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPasajeroActionPerformed
-        String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del pasajero:");        
+        String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del pasajero:");      
+        if (idTexto == null) { 
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String nombre = JOptionPane.showInputDialog(this, "Ingrese nombre del pasajero:");
+        if (nombre == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String edadTexto = JOptionPane.showInputDialog(this, "Ingrese edad del pasajero:");
+        if (edadTexto == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String origen = JOptionPane.showInputDialog(this, "Ingrese origen:");
-	String destino = JOptionPane.showInputDialog(this, "Ingrese destino:");        
+        if (origen == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+	String destino = JOptionPane.showInputDialog(this, "Ingrese destino:");  
+        if (destino == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+   
         String fechaHora = JOptionPane.showInputDialog(
             this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):" );
-        
+        if (fechaHora == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
 	try {
 	    int id = Integer.parseInt(idTexto);

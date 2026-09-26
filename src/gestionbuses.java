@@ -212,7 +212,7 @@ public class gestionbuses {
         for (Buses base : listaBuses) {
             if (agregados >= cantidad) break;
             if (busDisponibleEnHorario(base.getIdBus(), viaje.getFechaHoraInicio(), viaje.getFechaHoraFin(), null)) {
-                viaje.agregarBus(new Buses(base.getIdBus(), base.getCapacity()));
+                viaje.agregarBus(base.getIdBus(), base.getCapacity());
                 agregados++;
             }
         }

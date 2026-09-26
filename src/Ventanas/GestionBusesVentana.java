@@ -133,11 +133,19 @@ public class GestionBusesVentana extends javax.swing.JFrame {
                this,
                "Ingrese ID del bus:"
        );
+       if (idTexto == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
        String capacidadTexto = JOptionPane.showInputDialog(
                this,
                "Ingrese capacidad del bus:"
        );
+       if (capacidadTexto == null) {
+           JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+           return;
+       }
 
        try {
            int id = Integer.parseInt(idTexto);

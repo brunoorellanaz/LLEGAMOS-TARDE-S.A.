@@ -146,11 +146,40 @@ public class GestionViajesVentana extends javax.swing.JFrame {
 
     private void addViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addViajeActionPerformed
         String origen = JOptionPane.showInputDialog(this, "Ingrese el origen:");
+        if (origen == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String destino = JOptionPane.showInputDialog(this, "Ingrese el destino:");
+        if (destino == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String costoViajeTexto = JOptionPane.showInputDialog(this, "Ingrese el costo del viaje:");
+        if (costoViajeTexto == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String costoPasajeTexto = JOptionPane.showInputDialog(this, "Ingrese el costo del pasaje:");
+        if (costoPasajeTexto == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String fechaTexto = JOptionPane.showInputDialog(this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):");
+        if (fechaTexto == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
         String cantidadBusesTexto = JOptionPane.showInputDialog(this, "Ingrese cantidad de buses:");
+        if (cantidadBusesTexto == null) {
+            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
         try {
             double costoViaje = Double.parseDouble(costoViajeTexto);
