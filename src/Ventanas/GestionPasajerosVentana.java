@@ -117,87 +117,52 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void deletePasajeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletePasajeroActionPerformed
-        String idTexto = JOptionPane.showInputDialog(
-            this,
-            "Ingrese ID del pasajero:"
-        );
+        
         try {
+            String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del pasajero:");
+            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
             int id = Integer.parseInt(idTexto);
             boolean resultado = gestion.eliminarPasajero(id);
-            if (resultado) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Pasajero eliminado correctamente.",
-                    "Éxito",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-            } else {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se pudo eliminar el pasajero.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
-        } catch(NumberFormatException e ){
-            JOptionPane.showMessageDialog(
-                this,
-                e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
-        } catch (ElementoNoEncontradoException e) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            
-        }
-                
+            if (resultado) {
+            JOptionPane.showMessageDialog(this, "Pasajero eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo eliminar el pasajero.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch(NumberFormatException e ){
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+        } catch (ElementoNoEncontradoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);        
+        }         
     }//GEN-LAST:event_deletePasajeroActionPerformed
 
     private void addPasajeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPasajeroActionPerformed
-        String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del pasajero:");      
-        if (idTexto == null) { 
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        
+        try {
+            String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del pasajero:");      
+            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-        String nombre = JOptionPane.showInputDialog(this, "Ingrese nombre del pasajero:");
-        if (nombre == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+            String nombre = JOptionPane.showInputDialog(this, "Ingrese nombre del pasajero:");
+            if (nombre == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-        String edadTexto = JOptionPane.showInputDialog(this, "Ingrese edad del pasajero:");
-        if (edadTexto == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+            String edadTexto = JOptionPane.showInputDialog(this, "Ingrese edad del pasajero:");
+            if (edadTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-        String origen = JOptionPane.showInputDialog(this, "Ingrese origen:");
-        if (origen == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+            String origen = JOptionPane.showInputDialog(this, "Ingrese origen:");
+            if (origen == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-	String destino = JOptionPane.showInputDialog(this, "Ingrese destino:");  
-        if (destino == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-   
-        String fechaHora = JOptionPane.showInputDialog(
-            this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):" );
-        if (fechaHora == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+            String destino = JOptionPane.showInputDialog(this, "Ingrese destino:");  
+            if (destino == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-	try {
+            String fechaHora = JOptionPane.showInputDialog(this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):" );
+            if (fechaHora == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
 	    int id = Integer.parseInt(idTexto);
 	    int edad = Integer.parseInt(edadTexto);
 
@@ -210,21 +175,12 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
                 fechaHora
             );
         
-            if (resultado) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Pasajero agregado correctamente.",
-                    "Éxito",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            } else {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se pudo agregar el pasajero.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-	    }
+            if (resultado) JOptionPane.showMessageDialog(this, "Pasajero agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            else JOptionPane.showMessageDialog(this, "No se pudo agregar el pasajero.", "Error", JOptionPane.ERROR_MESSAGE);
+
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
+
         } catch (NumberFormatException e) {
 	    JOptionPane.showMessageDialog(this, "El ID y la edad deben ser números.", "Error", JOptionPane.ERROR_MESSAGE);
 	}
@@ -243,7 +199,6 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_getPasajerosActionPerformed
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPasajero;
     private javax.swing.JButton backMenu;
@@ -252,5 +207,4 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel tituloVentana;
     // End of variables declaration//GEN-END:variables
-
 }

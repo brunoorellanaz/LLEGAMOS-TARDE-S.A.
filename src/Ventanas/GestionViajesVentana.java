@@ -145,51 +145,30 @@ public class GestionViajesVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_backToMenuActionPerformed
 
     private void addViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addViajeActionPerformed
+        try {
         String origen = JOptionPane.showInputDialog(this, "Ingrese el origen:");
-        if (origen == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (origen == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
         String destino = JOptionPane.showInputDialog(this, "Ingrese el destino:");
-        if (destino == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (destino == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
         String costoViajeTexto = JOptionPane.showInputDialog(this, "Ingrese el costo del viaje:");
-        if (costoViajeTexto == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (costoViajeTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
         String costoPasajeTexto = JOptionPane.showInputDialog(this, "Ingrese el costo del pasaje:");
-        if (costoPasajeTexto == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (costoPasajeTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
         String fechaTexto = JOptionPane.showInputDialog(this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):");
-        if (fechaTexto == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (fechaTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
         
         String cantidadBusesTexto = JOptionPane.showInputDialog(this, "Ingrese cantidad de buses:");
-        if (cantidadBusesTexto == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+        if (cantidadBusesTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-        try {
             double costoViaje = Double.parseDouble(costoViajeTexto);
             double costoPasaje = Double.parseDouble(costoPasajeTexto);
             int cantidadBuses = Integer.parseInt(cantidadBusesTexto);
 
-            LocalDateTime fechaHora = LocalDateTime.parse(
-                fechaTexto,
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-            );
+            LocalDateTime fechaHora = LocalDateTime.parse(fechaTexto, java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
             Viajes viaje = gestion.agregarViaje(
                 origen,
@@ -200,86 +179,43 @@ public class GestionViajesVentana extends javax.swing.JFrame {
                 cantidadBuses
             );
 
-            JOptionPane.showMessageDialog(
-                this,
-                "Viaje agregado correctamente.\nID del viaje: " + viaje.getIdViaje(),
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Viaje agregado correctamente.\nID del viaje: " + viaje.getIdViaje(), "Éxito",JOptionPane.INFORMATION_MESSAGE);
+            
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "El costo y la cantidad de buses deben ser números.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "El costo y la cantidad de buses deben ser números.", "Error", JOptionPane.ERROR_MESSAGE);
 
         } catch (DateTimeParseException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "La fecha debe tener el formato dd/MM/yyyy HH:mm.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "La fecha debe tener el formato dd/MM/yyyy HH:mm.", "Error", JOptionPane.ERROR_MESSAGE);
 
         } catch (IllegalArgumentException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_addViajeActionPerformed
 
     private void deleteViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteViajeActionPerformed
-        String idTexto = JOptionPane.showInputDialog(
-            this,
-            "Ingrese ID del viaje:"
-        );
-
+        
         try {
+            String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del viaje:");
+            if (origen == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
             int id = Integer.parseInt(idTexto);
 
             gestion.eliminarViaje(id);
-
-            JOptionPane.showMessageDialog(
-                this,
-                "Viaje eliminado correctamente.",
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Viaje eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "El ID debe ser un número.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "El ID debe ser un número.", "Error", JOptionPane.ERROR_MESSAGE);
 
         } catch (ElementoNoEncontradoException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
         } catch (IllegalArgumentException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteViajeActionPerformed
 
@@ -290,14 +226,29 @@ public class GestionViajesVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_getViajesActionPerformed
 
     private void modViajeActionPerformed(java.awt.event.ActionEvent evt){
-	String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del viaje a modificar:");
-	String origen = JOptionPane.showInputDialog(this, "Ingrese el nuevo origen:");
-	String destino = JOptionPane.showInputDialog(this, "Ingrese el nuevo destino:");
-	String costoViajeTexto = JOptionPane.showInputDialog(this, "Ingrese el nuevo costo del viaje:");
-	String costoPasajeTexto = JOptionPane.showInputDialog(this, "Ingrese el nuevo costo del pasaje:");
-	String fechaTexto = JOptionPane.showInputDialog(this, "Ingrese nueva fecha y hora (dd/MM/yyyy HH:mm):");
+            
+        try {
+        String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del viaje a modificar:");
+        if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-	try {
+	String origen = JOptionPane.showInputDialog(this, "Ingrese el origen:");
+        if (origen == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
+        String destino = JOptionPane.showInputDialog(this, "Ingrese el destino:");
+        if (destino == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
+        String costoViajeTexto = JOptionPane.showInputDialog(this, "Ingrese el costo del viaje:");
+        if (costoViajeTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
+        String costoPasajeTexto = JOptionPane.showInputDialog(this, "Ingrese el costo del pasaje:");
+        if (costoPasajeTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
+        String fechaTexto = JOptionPane.showInputDialog(this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):");
+        if (fechaTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+        
+        String cantidadBusesTexto = JOptionPane.showInputDialog(this, "Ingrese cantidad de buses:");
+        if (cantidadBusesTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
 	    int id = Integer.parseInt(idTexto);
 	    double costoViaje = Double.parseDouble(costoViajeTexto);
 	    double costoPasaje = Double.parseDouble(costoPasajeTexto);
@@ -306,12 +257,17 @@ public class GestionViajesVentana extends javax.swing.JFrame {
 		java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 	    
 	    gestion.modificarViaje(id, origen, destino, costoViaje, costoPasaje, fechaHora);
-
 	    JOptionPane.showMessageDialog(this, "Viaje modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
+
 	} catch(DateTimeParseException e) {
 	    JOptionPane.showMessageDialog(this, "La fecha debe tener el formato dd/MM/yyyy HH:mm", "Error", JOptionPane.ERROR_MESSAGE);
+
 	} catch(ElementoNoEncontradoException e) {
 	    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
 	} catch(IllegalArgumentException e) {
 	    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	}

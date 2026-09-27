@@ -129,99 +129,53 @@ public class GestionBusesVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void addBusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBusActionPerformed
-        String idTexto = JOptionPane.showInputDialog(
-               this,
-               "Ingrese ID del bus:"
-       );
-       if (idTexto == null) {
-            JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-            return;
+        
+        try {
+            String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del bus:");
+            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
+            String capacidadTexto = JOptionPane.showInputDialog(this, "Ingrese capacidad del bus:");
+            if (capacidadTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
+                int id = Integer.parseInt(idTexto);
+                int capacidad = Integer.parseInt(capacidadTexto);
+
+                gestion.agregarBus(id, capacidad);
+                JOptionPane.showMessageDialog(this, "Bus agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "El ID y la capacidad deben ser números.", "Error", JOptionPane.ERROR_MESSAGE);
+
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error",JOptionPane.ERROR_MESSAGE);
         }
-
-       String capacidadTexto = JOptionPane.showInputDialog(
-               this,
-               "Ingrese capacidad del bus:"
-       );
-       if (capacidadTexto == null) {
-           JOptionPane.showMessageDialog(this, "Operacion cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
-           return;
-       }
-
-       try {
-           int id = Integer.parseInt(idTexto);
-           int capacidad = Integer.parseInt(capacidadTexto);
-
-           gestion.agregarBus(id, capacidad);
-
-           JOptionPane.showMessageDialog(
-                   this,
-                   "Bus agregado correctamente.",
-                   "Éxito",
-                   JOptionPane.INFORMATION_MESSAGE
-           );
-
-       } catch (NumberFormatException e) {
-
-           JOptionPane.showMessageDialog(
-                   this,
-                   "El ID y la capacidad deben ser números.",
-                   "Error",
-                   JOptionPane.ERROR_MESSAGE
-
-           );
-
-       } catch (IllegalArgumentException e) {
-
-           JOptionPane.showMessageDialog(
-                   this,
-                   e.getMessage(),
-                   "Error",
-                   JOptionPane.ERROR_MESSAGE
-           );
-       }
     }//GEN-LAST:event_addBusActionPerformed
 
     private void deleteBusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBusActionPerformed
-        String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del bus:");
-
+        
         try {
+            String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del bus:");
+            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
             int id = Integer.parseInt(idTexto);
 
             gestion.eliminarBus(id);
+            JOptionPane.showMessageDialog(this, "Bus eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
-            JOptionPane.showMessageDialog(
-                this,
-                "Bus eliminado correctamente.",
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "El ID debe ser un número.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "El ID debe ser un número.", "Error", JOptionPane.ERROR_MESSAGE);
 
         } catch (ElementoNoEncontradoException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
         } catch (IllegalArgumentException e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteBusActionPerformed
 
@@ -232,20 +186,29 @@ public class GestionBusesVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_getBusesActionPerformed
 
     private void modBusActionPerformed(java.awt.event.ActionEvent evt) {
-	String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del bus a modificar:");
-	String capacidadTexto = JOptionPane.showInputDialog(this, "Ingrese la nueva capacidad");
+	
+        try {
+            String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del bus a modificar:");
+            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-	try {
+            String capacidadTexto = JOptionPane.showInputDialog(this, "Ingrese la nueva capacidad");
+            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+
 	    int id = Integer.parseInt(idTexto);
 	    int nuevaCapacidad = Integer.parseInt(capacidadTexto);
 
 	    gestion.modificarBus(id, nuevaCapacidad);
-
 	    JOptionPane.showMessageDialog(this, "Bus modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (ProcesoCanceladoException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
+
 	} catch (NumberFormatException e) {
 	    JOptionPane.showMessageDialog(this, "El ID y la capacidad deben ser números", "Error", JOptionPane.ERROR_MESSAGE);
+
 	} catch (ElementoNoEncontradoException e) {
 	    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
 	} catch (IllegalArgumentException e) {
 	    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	}
