@@ -199,7 +199,7 @@ public class GestionViajesVentana extends javax.swing.JFrame {
         
         try {
             String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del viaje:");
-            if (origen == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+            if (idTexto== null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
             int id = Integer.parseInt(idTexto);
 
