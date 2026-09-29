@@ -1,6 +1,7 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.io.IOException;
 
 public class main {
     private static final String ARCHIVO = "datos_SIA.csv";
@@ -10,8 +11,12 @@ public class main {
         Scanner scanner = new Scanner(System.in);
         gestionbuses gestion = new gestionbuses();
 
-        gestion.setArchivo(ARCHIVO);
-        gestion.cargarDesdeArchivo(ARCHIVO);;
+        try {
+            gestion.cargarDesdeArchivo(ARCHIVO);
+        } catch (IOException e) {
+            System.out.println("No se pudo cargar el archivo: " + e.getMessage());
+            gestion.cargarDatosIniciales();
+        }
 
         System.out.println("========================================");
         System.out.println(" SISTEMA DE INFORMACIÓN - SIA");

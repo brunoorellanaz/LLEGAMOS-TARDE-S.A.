@@ -12,40 +12,55 @@ public class Buses {
         this.disponibility = true;
         this.pasajeros = new ArrayList<>();
     }
-        
-    //Setters
-    public void setIdBus(int id_bus) { this.id_bus = id_bus; }
+
+    public void setIdBus(int id_bus) {
+        this.id_bus = id_bus;
+    }
+
     public void setCapacity(int capacity) {
         this.capacity = capacity;
         this.disponibility = pasajeros.size() < capacity;
     }
-    public void setDisponibility(boolean disponibility) { this.disponibility = disponibility; }
-    
-    //Getters
-    public int getIdBus() { return id_bus; }
-    public int getCapacity() { return capacity; }
-    public boolean getDisponibility() { return disponibility; }
-    public int getCantidadPasajeros() { return pasajeros.size(); }
-    
 
-    //Demas metodos
+    public void setDisponibility(boolean disponibility) {
+        this.disponibility = disponibility;
+    }
+
+    public int getIdBus() {
+        return id_bus;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public boolean getDisponibility() {
+        return disponibility;
+    }
+
+    public int getCantidadPasajeros() {
+        return pasajeros.size();
+    }
+
     public void agregarPasajero(Pasajeros nuevo_pasajero) throws CapacidadExcedidaException {
         if (nuevo_pasajero == null) {
             throw new IllegalArgumentException("El pasajero no puede ser nulo.");
         }
+
         if (pasajeros.size() >= capacity) {
             disponibility = false;
             throw new CapacidadExcedidaException("El bus " + id_bus + " no tiene asientos disponibles.");
         }
+
         pasajeros.add(nuevo_pasajero);
         nuevo_pasajero.setBus(this);
         disponibility = pasajeros.size() < capacity;
     }
 
     public Pasajeros agregarPasajero(int id, int edad, String nombre) throws CapacidadExcedidaException {
-        Pasajeros p = new Pasajeros(id, edad, nombre);
-        agregarPasajero(p);
-        return p;
+        Pasajeros pasajero = new Pasajeros(id, edad, nombre);
+        agregarPasajero(pasajero);
+        return pasajero;
     }
 
     public boolean eliminarPasajero(Pasajeros pasajero) {
@@ -54,6 +69,7 @@ public class Buses {
             disponibility = pasajeros.size() < capacity;
             return true;
         }
+
         return false;
     }
 
@@ -61,11 +77,16 @@ public class Buses {
         return pasajeros.get(posicion);
     }
 
+    public ArrayList<Pasajeros> getPasajeros() {
+        return pasajeros;
+    }
+
     public void mostrarPasajeros() {
         if (pasajeros.isEmpty()) {
             System.out.println("El bus no tiene pasajeros.");
             return;
         }
+
         for (Pasajeros pasajero : pasajeros) {
             System.out.println(pasajero);
         }
@@ -73,7 +94,6 @@ public class Buses {
 
     @Override
     public String toString() {
-        return "Bus " + id_bus + " | Capacidad: " + capacity + " | Pasajeros: "
-                + pasajeros.size() + "/" + capacity + " | Disponible: " + disponibility;
+        return "Bus " + id_bus + " | Capacidad: " + capacity + " | Pasajeros: " + pasajeros.size() + "/" + capacity + " | Disponible: " + disponibility;
     }
 }

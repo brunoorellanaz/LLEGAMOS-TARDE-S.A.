@@ -1,451 +1,743 @@
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
-/** Controlador principal del dominio del sistema de buses. */
 public class gestionbuses {
-    private ArrayList<Buses> listaBuses;
-    private ArrayList<Pasajeros> listaPasajeros;
     private ArrayList<Viajes> listaViajes;
-    private int contadorViajes = 1;
-    
+    private int contadorViajes;
     private String archivo;
-    
     private static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
+    
     public gestionbuses() {
-        listaBuses = new ArrayList<>();
-        listaPasajeros = new ArrayList<>();
         listaViajes = new ArrayList<>();
+        contadorViajes = 1;
         cargarDatosIniciales();
     }
-
-    private void cargarDatosIniciales() {
-        Buses bus1 = new Buses(1, 40);
-        Buses bus2 = new Buses(2, 40);
-        Buses bus3 = new Buses(3, 50);
-        listaBuses.add(bus1);
-        listaBuses.add(bus2);
-        listaBuses.add(bus3);
-
-        Viajes viajeEjemplo = new Viajes(
-                contadorViajes++,
-                "Valparaiso",
-                "Santiago",
-                3000,
-                5000,
-                LocalDateTime.now().plusDays(1));
-        
-        Buses busEj = new Buses(bus1.getIdBus(), bus1.getCapacity());
-        viajeEjemplo.agregarBus(busEj);
-        
-        try {
-            Pasajeros pasajeroEj = busEj.agregarPasajero(1, 30, "Pasajero Ejemplo");
-            listaPasajeros.add(pasajeroEj);
-        } catch (CapacidadExcedidaException error){
-            System.out.println("No se pudo cargar el pasajero de ejemplo: " + error.getMessage());
-        }
-        
-        listaViajes.add(viajeEjemplo);
+    public void cargarDesdeArchivo(String ruta) throws IOException {
+        CargarDatos.cargar(this, ruta);
+        archivo = ruta;
     }
 
-    public void setContadorViajes(int contadorViajes) { this.contadorViajes = contadorViajes; }
-    public int getContadorViajes() { return contadorViajes; }
-    public ArrayList<Buses> getListaBuses() { return listaBuses; }
-    public ArrayList<Pasajeros> getListaPasajeros() { return listaPasajeros; }
-
-    // ==================== PERSISTENCIA ====================
-    // Este módulo se encarga de cargar y guardar los datos del sistema.
-    public void cargarDesdeArchivo(String ruta) {
-        try {
-            CargarDatos.cargar(this, ruta);
-            System.out.println("Datos cargados correctamente desde " + ruta);
-        } catch (Exception e) {
-            System.out.println("No se pudo cargar el archivo. Se usarán los datos iniciales: " + e.getMessage());
-            limpiarDatos();
-            cargarDatosIniciales();
-        }
+    public ArrayList<Viajes> getListaViajes() {
+        return listaViajes;
     }
 
-    public void guardarEnArchivo(String ruta) {
-        try {
-            GuardarDatos.guardar(this, ruta);
-            System.out.println("Datos guardados correctamente en " + ruta);
-        } catch (Exception e) {
-            System.out.println("No se pudieron guardar los datos: " + e.getMessage());
-        }
-    }
-    
-    // Archivo utilizado para guardar automáticamente los cambios realizados.
-    public void setArchivo(String archivo) {
-        this.archivo = archivo;
-    }
-    private void guardarCambios() {
-        if (archivo != null && !archivo.trim().isEmpty()) {
-            guardarEnArchivo(archivo);
-        }
-    }
-    public void limpiarDatos() {
-        listaBuses.clear();
-        listaPasajeros.clear();
-        listaViajes.clear();
-        contadorViajes = 1;
-    }
-    
-    
-    
-
-    // Métodos auxiliares usados exclusivamente por la carga de datos; no realizan guardado automático.
-    public void agregarBusInicial(int id, int capacidad) {
-        listaBuses.add(new Buses(id, capacidad));
-    }
-    public void agregarViajeInicial(Viajes viaje) {
-        listaViajes.add(viaje);
-        if (viaje.getIdViaje() >= contadorViajes) contadorViajes = viaje.getIdViaje() + 1;
-    }
-    public void agregarPasajeroInicial(Pasajeros pasajero) { listaPasajeros.add(pasajero); }
-
-    // ==================== BÚSQUEDAS ====================
-    // Módulo encargado de localizar buses, pasajeros y viajes por sus datos identificadores.
-    // SIA-5: sobrecarga en una segunda clase distinta de Buses.
-    public Pasajeros buscarPasajero(int id) throws ElementoNoEncontradoException {
-        for (Pasajeros p : listaPasajeros) {
-            if (p.getIdPasajero() == id) return p;
-        }
-        throw new ElementoNoEncontradoException("No existe el pasajero con ID " + id + ".");
-    }
-
-    public Pasajeros buscarPasajero(String nombre) throws ElementoNoEncontradoException {
-        for (Pasajeros p : listaPasajeros) {
-            if (p.getNombre().equalsIgnoreCase(nombre)) return p;
-        }
-        throw new ElementoNoEncontradoException("No existe el pasajero con nombre " + nombre + ".");
-    }
-
-    public Buses buscarBus(int id) throws ElementoNoEncontradoException {
-        for (Buses bus : listaBuses) {
-            if (bus.getIdBus() == id) return bus;
-        }
-        throw new ElementoNoEncontradoException("No existe el bus con ID " + id + ".");
-    }
-
-    public Viajes buscarViaje(int id) throws ElementoNoEncontradoException {
-        for (Viajes viaje : listaViajes) {
-            if (viaje.getIdViaje() == id) return viaje;
-        }
-        throw new ElementoNoEncontradoException("No existe el viaje con ID " + id + ".");
-    }
-
-    // ==================== CRUD BUSES ====================
-    // Módulo encargado de agregar, modificar, eliminar y listar buses.
-    public void agregarBus(int id, int capacidad) throws IllegalArgumentException {
-        if (id <= 0 || capacidad <= 0) throw new IllegalArgumentException("ID y capacidad deben ser mayores que cero.");
-        try { buscarBus(id); throw new IllegalArgumentException("Ya existe un bus con ese ID."); }
-        catch (ElementoNoEncontradoException e) { 
-            listaBuses.add(new Buses(id, capacidad));
-            guardarCambios();
-        }  
-    }
-    
-
-    public boolean modificarBus(int id, int nuevaCapacidad) throws ElementoNoEncontradoException {
-        Buses bus = buscarBus(id);
-        if (nuevaCapacidad <= 0 || nuevaCapacidad < bus.getCantidadPasajeros()) {
-            throw new IllegalArgumentException("La capacidad debe ser positiva y no menor que los pasajeros actuales.");
-        }
-        bus.setCapacity(nuevaCapacidad);
-        guardarCambios();
-        return true;
-    }
-
-    public boolean eliminarBus(int id) throws ElementoNoEncontradoException {
-        Buses bus = buscarBus(id);
-        for (Viajes viaje : listaViajes) {
-            if (viaje.tieneBus(id) && viaje.estaDisponible()) {
-                throw new IllegalArgumentException("El bus está asignado a un viaje futuro y no puede eliminarse.");
-            }
-        }
-        boolean eliminado = listaBuses.remove(bus);
-        if (eliminado) {
-            guardarCambios();
-        }
-        return eliminado;
-    }
-
-    public String listarBusesTexto() {
-        StringBuilder sb = new StringBuilder("=== BUSES ===\n");
-        for (Buses bus : listaBuses) sb.append(bus).append("\n");
-        return sb.toString();
-    }
-    
-    public int getCantidadBuses() {
-        return listaBuses.size();
-    }
-
-    public Buses obtenerBus(int posicion) {
-        return listaBuses.get(posicion);
-    }
-
-    // ==================== CRUD VIAJES ====================
-    // Módulo encargado de agregar, modificar, eliminar y listar viajes.
-    public Viajes agregarViaje(String origen, String destino, double costoViaje,
-                               double costoPasaje, LocalDateTime fechaHora, int cantidadBuses)
-            throws IllegalArgumentException {
-        if (origen == null || origen.trim().isEmpty() || destino == null || destino.trim().isEmpty())
-            throw new IllegalArgumentException("Origen y destino son obligatorios.");
-        if (costoViaje < 0 || costoPasaje < 0 || fechaHora == null || cantidadBuses <= 0)
-            throw new IllegalArgumentException("Datos del viaje inválidos.");
-        Viajes viaje = new Viajes(contadorViajes++, origen.trim(), destino.trim(), costoViaje, costoPasaje, fechaHora);
-        int agregados = agregarBusesDisponibles(viaje, cantidadBuses);
-        if (agregados == 0) {
-            contadorViajes--;
-            throw new IllegalArgumentException("No hay buses disponibles para el horario indicado.");
-        }
-        listaViajes.add(viaje);
-        guardarCambios();
-        return viaje;
-    }
-
-    private int agregarBusesDisponibles(Viajes viaje, int cantidad) {
-        int agregados = 0;
-        for (Buses base : listaBuses) {
-            if (agregados >= cantidad) break;
-            if (busDisponibleEnHorario(base.getIdBus(), viaje.getFechaHoraInicio(), viaje.getFechaHoraFin(), null)) {
-                viaje.agregarBus(base.getIdBus(), base.getCapacity());
-                agregados++;
-            }
-        }
-        return agregados;
-    }
-
-    private boolean busDisponibleEnHorario(int idBus, LocalDateTime inicio, LocalDateTime fin, Integer excluirViaje) {
-        for (Viajes viaje : listaViajes) {
-            if (excluirViaje != null && viaje.getIdViaje() == excluirViaje) continue;
-            if (!viaje.tieneBus(idBus)) continue;
-            boolean seCruzan = inicio.isBefore(viaje.getFechaHoraFin()) && fin.isAfter(viaje.getFechaHoraInicio());
-            if (seCruzan) return false;
-        }
-        return true;
-    }
-
-    public boolean modificarViaje(int id, String origen, String destino, double costoViaje,
-                                  double costoPasaje, LocalDateTime nuevaFechaHora)
-            throws ElementoNoEncontradoException {
-        Viajes viaje = buscarViaje(id);
-        if (origen == null || origen.trim().isEmpty() || destino == null || destino.trim().isEmpty())
-            throw new IllegalArgumentException("Origen y destino son obligatorios.");
-        if (costoViaje < 0 || costoPasaje < 0 || nuevaFechaHora == null)
-            throw new IllegalArgumentException("Datos del viaje inválidos.");
-        viaje.setOrigen(origen.trim());
-        viaje.setDestino(destino.trim());
-        viaje.setCostoViaje(costoViaje);
-        viaje.setCostoPasaje(costoPasaje);
-        viaje.setFechaHoraInicio(nuevaFechaHora);
-        guardarCambios();
-        return true;
-    }
-
-    public boolean eliminarViaje(int id) throws ElementoNoEncontradoException {
-        Viajes viaje = buscarViaje(id);
-        if (!viaje.estaDisponible()) throw new IllegalArgumentException("No se puede eliminar un viaje que ya comenzó.");
-        for(int i = 0; i < viaje.getCantidadBuses(); i++){
-            Buses bus = viaje.obtenerBusPorPosicion(i);
-            while(bus.getCantidadPasajeros() > 0){
-                Pasajeros pasajero = bus.obtenerPasajero(0);
-                bus.eliminarPasajero(pasajero);
-                
-            }
-        }
-
-
-        boolean eliminado = listaViajes.remove(viaje);
-        if (eliminado) {
-            guardarCambios();
-        }
-        return eliminado;
-    }
-
-    public String listarViajesTexto() {
-        StringBuilder sb = new StringBuilder("=== VIAJES ===\n");
-        for (Viajes viaje : listaViajes) {
-            sb.append(viaje).append(" | Inicio: ").append(viaje.getFechaHoraInicio().format(FORMATO))
-              .append(" | Buses: ").append(viaje.getCantidadBuses()).append("\n");
-        }
-        if (listaViajes.isEmpty()) sb.append("No existen viajes registrados.\n");
-        return sb.toString();
-    }
-    
     public int getCantidadViajes() {
         return listaViajes.size();
     }
 
     public Viajes obtenerViaje(int posicion) {
+        if (posicion < 0 || posicion >= listaViajes.size()) {
+            return null;
+        }
+
         return listaViajes.get(posicion);
     }
 
-    // ==================== RESERVAS ====================
-    // Módulo encargado de crear, cancelar y reagendar reservas de pasajeros.
-    public boolean reservarViaje(int idPasajero, String nombre, int edad,
-                              String origen, String destino, String fechaHora) {
-        try {
-            if (idPasajero <= 0 || edad <= 0 || nombre == null || nombre.trim().isEmpty())
-                throw new IllegalArgumentException("Datos del pasajero inválidos.");
-            try { buscarPasajero(idPasajero); throw new IllegalArgumentException("Ya existe una reserva con ese ID de pasajero."); }
-            catch (ElementoNoEncontradoException e) { /* ID disponible */ }
+    public Viajes buscarViaje(int id) throws ElementoNoEncontradoException {
+        for (Viajes viaje : listaViajes) {
+            if (viaje.getIdViaje() == id) {
+                return viaje;
+            }
+        }
 
-            LocalDateTime fecha = parseFechaHora(fechaHora);
-            Viajes viajeEncontrado = null;
-            for (Viajes viaje : listaViajes) {
-                if (viaje.getOrigen().equalsIgnoreCase(origen) && viaje.getDestino().equalsIgnoreCase(destino)
-                        && viaje.getFechaHoraInicio().equals(fecha)) {
-                    viajeEncontrado = viaje;
-                    break;
+        throw new ElementoNoEncontradoException("No existe el viaje con ID " + id + ".");
+    }
+
+    public void setArchivo(String archivo) {
+        this.archivo = archivo;
+    }
+
+    public String getArchivo() {
+        return archivo;
+    }
+
+    public void agregarViaje(Viajes viaje) {
+        if (viaje == null) {
+            return;
+        }
+
+        listaViajes.add(viaje);
+
+        if (viaje.getIdViaje() >= contadorViajes) {
+            contadorViajes = viaje.getIdViaje() + 1;
+        }
+    }
+
+    public Viajes agregarViaje(String origen, String destino, double costoViaje, double costoPasaje, LocalDateTime fechaHoraInicio, int duracionMinutos) {
+        Viajes viaje = new Viajes(contadorViajes, origen, destino, costoViaje, costoPasaje, fechaHoraInicio);
+        viaje.setDuracionMinutos(duracionMinutos);
+        agregarViaje(viaje);
+        return viaje;
+    }
+
+    public void agregarViajeInicial(Viajes viaje) {
+        agregarViaje(viaje);
+    }
+
+    public void eliminarViaje(int id) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(id);
+        listaViajes.remove(viaje);
+    }
+
+    public void modificarViaje(int id, String origen, String destino, double costoViaje, double costoPasaje, LocalDateTime fechaHoraInicio) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(id);
+
+        if (origen == null || origen.trim().isEmpty()) {
+            throw new IllegalArgumentException("El origen no puede estar vacío.");
+        }
+
+        if (destino == null || destino.trim().isEmpty()) {
+            throw new IllegalArgumentException("El destino no puede estar vacío.");
+        }
+
+        if (costoViaje < 0) {
+            throw new IllegalArgumentException("El costo del viaje no puede ser negativo.");
+        }
+
+        if (costoPasaje < 0) {
+            throw new IllegalArgumentException("El costo del pasaje no puede ser negativo.");
+        }
+
+        if (fechaHoraInicio == null) {
+            throw new IllegalArgumentException("La fecha del viaje no puede ser nula.");
+        }
+
+        viaje.setOrigen(origen);
+        viaje.setDestino(destino);
+        viaje.setCostoViaje(costoViaje);
+        viaje.setCostoPasaje(costoPasaje);
+        viaje.setFechaHoraInicio(fechaHoraInicio);
+    }
+
+    public void reagendarViaje(int id, LocalDateTime nuevaFecha) throws ElementoNoEncontradoException {
+        if (nuevaFecha == null) {
+            throw new IllegalArgumentException("La fecha no puede ser nula.");
+        }
+
+        Viajes viaje = buscarViaje(id);
+        viaje.setFechaHoraInicio(nuevaFecha);
+    }
+
+    // ============================================================
+    // GESTION DE BUSES
+    // ============================================================
+
+    public void agregarBus(int id, int capacidad) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("El ID del bus debe ser positivo.");
+        }
+
+        if (capacidad <= 0) {
+            throw new IllegalArgumentException("La capacidad debe ser mayor que cero.");
+        }
+
+        if (buscarBusSinExcepcion(id) != null) {
+            throw new IllegalArgumentException("Ya existe un bus con el ID " + id + ".");
+        }
+
+        if (listaViajes.isEmpty()) {
+            LocalDateTime fecha = LocalDateTime.now().plusDays(1);
+            Viajes viaje = new Viajes(contadorViajes, "Sin origen", "Sin destino", 100000, 5000, fecha);
+            viaje.agregarBus(id, capacidad);
+            agregarViaje(viaje);
+            return;
+        }
+
+        for (Viajes viaje : listaViajes) {
+            if (!viaje.tieneBus(id)) {
+                viaje.agregarBus(id, capacidad);
+            }
+        }
+    }
+
+    public void eliminarBus(int id) throws ElementoNoEncontradoException {
+        Buses bus = buscarBusSinExcepcion(id);
+
+        if (bus == null) {
+            throw new ElementoNoEncontradoException("No existe un bus con el ID " + id + ".");
+        }
+
+        if (bus.getCantidadPasajeros() > 0) {
+            throw new IllegalArgumentException("No se puede eliminar el bus porque tiene pasajeros.");
+        }
+
+        boolean eliminado = false;
+
+        for (Viajes viaje : listaViajes) {
+            if (viaje.tieneBus(id)) {
+                viaje.eliminarBus(id);
+                eliminado = true;
+            }
+        }
+
+        if (!eliminado) {
+            throw new ElementoNoEncontradoException("No se pudo eliminar el bus.");
+        }
+    }
+
+    public void modificarBus(int id, int nuevaCapacidad) throws ElementoNoEncontradoException {
+        if (nuevaCapacidad <= 0) {
+            throw new IllegalArgumentException("La capacidad debe ser mayor que cero.");
+        }
+
+        Buses bus = buscarBusSinExcepcion(id);
+
+        if (bus == null) {
+            throw new ElementoNoEncontradoException("No existe un bus con el ID " + id + ".");
+        }
+
+        for (Viajes viaje : listaViajes) {
+            Buses busViaje = viaje.obtenerBus(id);
+
+            if (busViaje != null) {
+                if (nuevaCapacidad < busViaje.getCantidadPasajeros()) {
+                    throw new IllegalArgumentException("La nueva capacidad no puede ser menor que la cantidad de pasajeros.");
                 }
-            }
 
-            if (viajeEncontrado == null) {
-                viajeEncontrado = agregarViaje(origen, destino, 100000, 5000, fecha, listaBuses.size());
+                busViaje.setCapacity(nuevaCapacidad);
             }
-            if (!viajeEncontrado.estaDisponible()) {
-                System.out.println("El viaje ya comenzó o no está disponible.");
-                return false;
-            }
-            Buses bus = viajeEncontrado.buscarBusDisponible();
-            if (bus == null) {
-                System.out.println("No hay buses disponibles para este viaje.");
-                return false;
-            }
-            Pasajeros pasajero = bus.agregarPasajero(idPasajero, edad, nombre.trim());
-            listaPasajeros.add(pasajero);
-            guardarCambios();
-            System.out.println("\nViaje reservado con éxito.");
-            System.out.println("Pasajero: " + nombre + " | Bus: " + bus.getIdBus() + " | Viaje ID: " + viajeEncontrado.getIdViaje());
-            return true;
-        } catch (CapacidadExcedidaException e) {
-            System.out.println("No se pudo reservar: " + e.getMessage());
-            return false;
-        } catch (DateTimeParseException e) {
-            System.out.println("Fecha/hora inválida. Use dd/MM/yyyy HH:mm.");
-            return false;
-        } catch (IllegalArgumentException e) {
-            System.out.println("No se pudo reservar: " + e.getMessage());
-            return false;
         }
     }
 
-    public void cancelarViaje(int idReserva) {
-        try {
-            Pasajeros pasajero = buscarPasajero(idReserva);
-            Buses bus = pasajero.getBus();
-            if (bus != null) bus.eliminarPasajero(pasajero);
-            boolean cancelada = listaPasajeros.remove(pasajero);
-            if (cancelada) {
-                guardarCambios();
-                System.out.println("Reserva " + idReserva + " cancelada correctamente.");
-            }
-        } catch (ElementoNoEncontradoException e) {
-            System.out.println(e.getMessage());
-        }
-    }
+    public int getCantidadBuses() {
+        ArrayList<Integer> ids = new ArrayList<>();
 
-    public void reagendarViaje(int idReserva, String nuevaFechaHora) {
-        try {
-            Pasajeros pasajero = buscarPasajero(idReserva);
-            LocalDateTime nuevaFecha = parseFechaHora(nuevaFechaHora);
-            Viajes nuevoViaje = null;
-            for (Viajes viaje : listaViajes) {
-                if (viaje.getFechaHoraInicio().equals(nuevaFecha) && viaje.estaDisponible()) {
-                    nuevoViaje = viaje;
-                    break;
-                }
-            }
-            if (nuevoViaje == null) {
-                System.out.println("No existe un viaje disponible para esa fecha y hora.");
-                return;
-            }
-            Buses nuevoBus = nuevoViaje.buscarBusDisponible();
-            if (nuevoBus == null) {
-                System.out.println("No hay espacio disponible en el nuevo viaje.");
-                return;
-            }
-            Buses anterior = pasajero.getBus();
-            nuevoBus.agregarPasajero(pasajero);
-            if (anterior != null) anterior.eliminarPasajero(pasajero);
-            guardarCambios();
-            System.out.println("Reserva reagendada correctamente al viaje " + nuevoViaje.getIdViaje() + ".");
-        } catch (ElementoNoEncontradoException e) {
-            System.out.println(e.getMessage());
-        } catch (CapacidadExcedidaException e) {
-            System.out.println("No se pudo reagendar: " + e.getMessage());
-        } catch (DateTimeParseException e) {
-            System.out.println("Fecha/hora inválida. Use dd/MM/yyyy HH:mm.");
-        }
-    }
-
-    private LocalDateTime parseFechaHora(String texto) {
-        return LocalDateTime.parse(texto.trim(), FORMATO);
-    }
-    
-    
-    public int getCantidadPasajeros() {
-    return listaPasajeros.size();
-    }
-
-    public Pasajeros obtenerPasajero(int posicion) {
-        return listaPasajeros.get(posicion);
-        
-    }
-    
-    public boolean eliminarPasajero(int id) throws ElementoNoEncontradoException {
-        Pasajeros pasajero = buscarPasajero(id);
-        Buses bus = pasajero.getBus();
-
-        if (bus != null) {
-            bus.eliminarPasajero(pasajero);
-        }
-
-        boolean eliminado = listaPasajeros.remove(pasajero);
-        if (eliminado) {
-            guardarCambios();
-        }
-        return eliminado;
-    }
-        
-    // ==================== SIA-9: UTILIDAD DE NEGOCIO ====================
-    // Módulo de utilidad de negocio: filtra los viajes según su rentabilidad.
-    public ArrayList<Viajes> obtenerViajesRentables() {
-        ArrayList<Viajes> resultado = new ArrayList<>();
         for (Viajes viaje : listaViajes) {
             for (int i = 0; i < viaje.getCantidadBuses(); i++) {
                 Buses bus = viaje.obtenerBusPorPosicion(i);
-                if (viaje.esRentable(bus)) {
-                    resultado.add(viaje);
-                    break;
+
+                if (bus != null && !ids.contains(bus.getIdBus())) {
+                    ids.add(bus.getIdBus());
                 }
             }
         }
-        return resultado;
+        return ids.size();
+    }
+
+    public Buses obtenerBus(int posicion) {
+        ArrayList<Buses> buses = obtenerBusesUnicos();
+
+        if (posicion < 0 || posicion >= buses.size()) {
+            return null;
+        }
+
+        return buses.get(posicion);
+    }
+
+    public Buses buscarBus(int id) throws ElementoNoEncontradoException{
+        return buscarBusSinExcepcion(id);
+    }
+
+    private Buses buscarBusSinExcepcion(int id) {
+        for (Viajes viaje : listaViajes) {
+            Buses bus = viaje.obtenerBus(id);
+
+            if (bus != null) {
+                return bus;
+            }
+        }
+
+        return null;
+    }
+
+    private ArrayList<Buses> obtenerBusesUnicos() {
+        ArrayList<Buses> buses = new ArrayList<>();
+
+        for (Viajes viaje : listaViajes) {
+            for (int i = 0; i < viaje.getCantidadBuses(); i++) {
+                Buses bus = viaje.obtenerBusPorPosicion(i);
+
+                if (bus != null) {
+                    boolean existe = false;
+
+                    for (Buses busExistente : buses) {
+                        if (busExistente.getIdBus() == bus.getIdBus()) {
+                            existe = true;
+                            break;
+                        }
+                    }
+
+                    if (!existe) {
+                        buses.add(bus);
+                    }
+                }
+            }
+        }
+
+        return buses;
+    }
+
+    // ============================================================
+    // GESTION DE PASAJEROS
+    // ============================================================
+
+    public int getCantidadPasajeros() {
+        return obtenerPasajerosUnicos().size();
+    }
+
+    public Pasajeros obtenerPasajero(int posicion) {
+        ArrayList<Pasajeros> pasajeros = obtenerPasajerosUnicos();
+
+        if (posicion < 0 || posicion >= pasajeros.size()) {
+            return null;
+        }
+
+        return pasajeros.get(posicion);
+    }
+
+    public Pasajeros buscarPasajero(int id) throws ElementoNoEncontradoException {
+        for (Viajes viaje : listaViajes) {
+            try {
+                return viaje.buscarPasajero(id);
+            } catch (ElementoNoEncontradoException e) {
+            }
+        }
+
+        throw new ElementoNoEncontradoException("No existe un pasajero con ID " + id + ".");
+    }
+
+    public boolean eliminarPasajero(int id) throws ElementoNoEncontradoException{
+        for (Viajes viaje : listaViajes) {
+            try {
+                Pasajeros pasajero = viaje.buscarPasajero(id);
+                Buses bus = pasajero.getBus();
+
+                if (bus != null) {
+                    return bus.eliminarPasajero(pasajero);
+                }
+            } catch (ElementoNoEncontradoException e) {
+            }
+        }
+
+        return false;
+    }
+
+    private ArrayList<Pasajeros> obtenerPasajerosUnicos() {
+        ArrayList<Pasajeros> pasajeros = new ArrayList<>();
+
+        for (Viajes viaje : listaViajes) {
+            for (int i = 0; i < viaje.getCantidadBuses(); i++) {
+                Buses bus = viaje.obtenerBusPorPosicion(i);
+
+                if (bus == null) {
+                    continue;
+                }
+
+                for (int j = 0; j < bus.getCantidadPasajeros(); j++) {
+                    Pasajeros pasajero = bus.obtenerPasajero(j);
+
+                    if (pasajero != null) {
+                        boolean existe = false;
+
+                        for (Pasajeros pasajeroExistente : pasajeros) {
+                            if (pasajeroExistente.getIdPasajero() == pasajero.getIdPasajero()) {
+                                existe = true;
+                                break;
+                            }
+                        }
+
+                        if (!existe) {
+                            pasajeros.add(pasajero);
+                        }
+                    }
+                }
+            }
+        }
+
+        return pasajeros;
+    }
+
+    // ============================================================
+    // RESERVAS
+    // ============================================================
+
+    public boolean reservarViaje(int idPasajero, String nombre, int edad, String origen, String destino, String fechaHora) {
+        if (idPasajero <= 0) {
+            throw new IllegalArgumentException("El ID del pasajero debe ser positivo.");
+        }
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacío.");
+        }
+
+        if (edad <= 0) {
+            throw new IllegalArgumentException("La edad debe ser mayor que cero.");
+        }
+
+        if (origen == null || origen.trim().isEmpty()) {
+            throw new IllegalArgumentException("El origen no puede estar vacío.");
+        }
+
+        if (destino == null || destino.trim().isEmpty()) {
+            throw new IllegalArgumentException("El destino no puede estar vacío.");
+        }
+
+        if (fechaHora == null || fechaHora.trim().isEmpty()) {
+            throw new IllegalArgumentException("La fecha y hora no pueden estar vacías.");
+        }
+
+        try {
+            buscarPasajero(idPasajero);
+            throw new IllegalArgumentException("Ya existe un pasajero con el ID " + idPasajero + ".");
+        } catch (ElementoNoEncontradoException e) {
+        }
+
+        LocalDateTime fecha;
+
+        try {
+            fecha = LocalDateTime.parse(fechaHora, FORMATO);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("La fecha debe tener el formato dd/MM/yyyy HH:mm.");
+        }
+
+        Viajes viajeEncontrado = null;
+
+        for (Viajes viaje : listaViajes) {
+            if (viaje.getOrigen().equalsIgnoreCase(origen) && viaje.getDestino().equalsIgnoreCase(destino) && viaje.getFechaHoraInicio().equals(fecha)) {
+                viajeEncontrado = viaje;
+                break;
+            }
+        }
+
+        if (viajeEncontrado == null) {
+            viajeEncontrado = agregarViaje(origen, destino, 100000, 5000, fecha, 120);
+
+            viajeEncontrado.agregarBus(1, 40);
+            viajeEncontrado.agregarBus(2, 40);
+            viajeEncontrado.agregarBus(3, 50);
+        }
+
+        if (!viajeEncontrado.estaDisponible()) {
+            throw new IllegalArgumentException("El viaje ya comenzó o no está disponible.");
+        }
+
+        Buses bus = viajeEncontrado.buscarBusDisponible();
+
+        if (bus == null) {
+            throw new IllegalArgumentException("No hay asientos disponibles para este viaje.");
+        }
+
+        try {
+            Pasajeros pasajero = new Pasajeros(idPasajero, edad, nombre);
+            bus.agregarPasajero(pasajero);
+            return true;
+        } catch (CapacidadExcedidaException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    // ============================================================
+    // VIAJES RENTABLES
+    // ============================================================
+
+    public ArrayList<Viajes> obtenerViajesRentables() {
+        ArrayList<Viajes> rentables = new ArrayList<>();
+
+        for (Viajes viaje : listaViajes) {
+            boolean rentable = false;
+
+            for (int i = 0; i < viaje.getCantidadBuses(); i++) {
+                Buses bus = viaje.obtenerBusPorPosicion(i);
+
+                if (viaje.esRentable(bus)) {
+                    rentable = true;
+                    break;
+                }
+            }
+
+            if (rentable) {
+                rentables.add(viaje);
+            }
+        }
+
+        return rentables;
+    }
+
+    // ============================================================
+    // OPERACIONES DE VIAJES
+    // ============================================================
+
+    public void agregarBusAViaje(int idViaje, int idBus, int capacidad) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+
+        if (!viaje.tieneBus(idBus)) {
+            viaje.agregarBus(idBus, capacidad);
+        }
+    }
+
+    public void eliminarBusDeViaje(int idViaje, int idBus) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+        Buses bus = viaje.obtenerBus(idBus);
+
+        if (bus != null && bus.getCantidadPasajeros() > 0) {
+            throw new IllegalArgumentException("No se puede eliminar un bus que tiene pasajeros.");
+        }
+
+        viaje.eliminarBus(idBus);
+    }
+
+    public Buses obtenerBus(int idViaje, int idBus) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+        Buses bus = viaje.obtenerBus(idBus);
+
+        if (bus == null) {
+            throw new ElementoNoEncontradoException("No existe el bus " + idBus + " en el viaje " + idViaje + ".");
+        }
+
+        return bus;
+    }
+
+    public Pasajeros buscarPasajero(int idViaje, int idPasajero) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+        return viaje.buscarPasajero(idPasajero);
+    }
+
+    public void reservarPasaje(int idViaje, int idPasajero, int edad, String nombre) throws ElementoNoEncontradoException, CapacidadExcedidaException {
+        Viajes viaje = buscarViaje(idViaje);
+
+        if (!viaje.estaDisponible()) {
+            throw new IllegalArgumentException("El viaje ya comenzó o no está disponible.");
+        }
+
+        try {
+            viaje.buscarPasajero(idPasajero);
+            throw new IllegalArgumentException("Ya existe un pasajero con el ID " + idPasajero + " en este viaje.");
+        } catch (ElementoNoEncontradoException e) {
+        }
+
+        Buses bus = viaje.buscarBusDisponible();
+
+        if (bus == null) {
+            throw new CapacidadExcedidaException("No hay buses con asientos disponibles para este viaje.");
+        }
+
+        Pasajeros pasajero = new Pasajeros(idPasajero, edad, nombre);
+        bus.agregarPasajero(pasajero);
+    }
+
+    public void cancelarReserva(int idViaje, int idPasajero) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+        Pasajeros pasajero = viaje.buscarPasajero(idPasajero);
+        Buses bus = pasajero.getBus();
+
+        if (bus == null) {
+            throw new ElementoNoEncontradoException("El pasajero no está asociado a ningún bus.");
+        }
+
+        bus.eliminarPasajero(pasajero);
+    }
+
+    public void reagendarPasajero(int idViaje, int idPasajero, int idBus) throws ElementoNoEncontradoException, CapacidadExcedidaException {
+        Viajes viaje = buscarViaje(idViaje);
+        Pasajeros pasajero = viaje.buscarPasajero(idPasajero);
+        Buses nuevoBus = viaje.obtenerBus(idBus);
+
+        if (nuevoBus == null) {
+            throw new ElementoNoEncontradoException("No existe el bus " + idBus + " en este viaje.");
+        }
+
+        Buses busActual = pasajero.getBus();
+
+        if (busActual == nuevoBus) {
+            return;
+        }
+
+        nuevoBus.agregarPasajero(pasajero);
+
+        if (busActual != null) {
+            busActual.eliminarPasajero(pasajero);
+        }
+    }
+
+    // ============================================================
+    // PERSISTENCIA
+    // ============================================================
+
+    public void guardarCambios() throws IOException {
+        if (archivo == null || archivo.trim().isEmpty()) {
+            throw new IOException("No se ha definido un archivo de guardado.");
+        }
+
+        GuardarDatos.guardar(this, archivo);
+    }
+
+    public void guardarCambios(String ruta) throws IOException {
+        archivo = ruta;
+        GuardarDatos.guardar(this, ruta);
+    }
+
+    public void cargarDatos(String ruta) throws IOException {
+        archivo = ruta;
+        CargarDatos.cargar(this, ruta);
+        actualizarContador();
+    }
+
+    public void limpiarDatos() {
+        listaViajes.clear();
+        contadorViajes = 1;
+    }
+
+    private void actualizarContador() {
+        contadorViajes = 1;
+
+        for (Viajes viaje : listaViajes) {
+            if (viaje.getIdViaje() >= contadorViajes) {
+                contadorViajes = viaje.getIdViaje() + 1;
+            }
+        }
+    }
+
+    // ============================================================
+    // DATOS INICIALES
+    // ============================================================
+
+    public void cargarDatosIniciales() {
+        LocalDateTime fecha = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
+
+        Viajes viaje = new Viajes(contadorViajes, "Valparaiso", "Santiago", 100000, 5000, fecha);
+
+        Buses bus1 = new Buses(1, 40);
+        Buses bus2 = new Buses(2, 40);
+        Buses bus3 = new Buses(3, 50);
+
+        viaje.agregarBus(bus1);
+        viaje.agregarBus(bus2);
+        viaje.agregarBus(bus3);
+
+        try {
+            Pasajeros pasajero = new Pasajeros(1, 30, "Pasajero Ejemplo");
+            bus1.agregarPasajero(pasajero);
+        } catch (CapacidadExcedidaException e) {
+            System.out.println("No se pudo agregar el pasajero inicial: " + e.getMessage());
+        }
+
+        agregarViaje(viaje);
+    }
+
+    public String obtenerInformacionViaje(int idViaje) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+        StringBuilder informacion = new StringBuilder();
+
+        informacion.append("Viaje: ").append(viaje.getIdViaje()).append("\n");
+        informacion.append("Origen: ").append(viaje.getOrigen()).append("\n");
+        informacion.append("Destino: ").append(viaje.getDestino()).append("\n");
+        informacion.append("Costo viaje: $").append(viaje.getCostoViaje()).append("\n");
+        informacion.append("Costo pasaje: $").append(viaje.getCostoPasaje()).append("\n");
+        informacion.append("Inicio: ").append(viaje.getFechaHoraInicio().format(FORMATO)).append("\n");
+        informacion.append("Fin: ").append(viaje.getFechaHoraFin().format(FORMATO)).append("\n");
+        informacion.append("Buses: ").append(viaje.getCantidadBuses()).append("\n");
+        informacion.append("Pasajeros: ").append(viaje.getCantidadPasajeros()).append("\n");
+
+        return informacion.toString();
+    }
+
+    public void mostrarViaje() {
+        if (listaViajes.isEmpty()) {
+            System.out.println("No existen viajes registrados.");
+            return;
+        }
+
+        for (Viajes viaje : listaViajes) {
+            viaje.mostrarViaje();
+            System.out.println();
+        }
+    }
+
+    public void mostrarViaje(int idViaje) throws ElementoNoEncontradoException {
+        Viajes viaje = buscarViaje(idViaje);
+        viaje.mostrarViaje();
+    }
+
+    //Estos son métodos que son usamos como sobrecarga por cambios en la estructura de datos
+    public void cancelarViaje(int id) throws ElementoNoEncontradoException {
+        eliminarPasajero(id);
+    }
+
+    public void reagendarViaje(int id, String fechaHora) throws ElementoNoEncontradoException {
+        try {
+            LocalDateTime fecha = LocalDateTime.parse(fechaHora, FORMATO);
+            reagendarViaje(id, fecha);
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new IllegalArgumentException("Fecha inválida. Use el formato dd/MM/yyyy HH:mm.");
+        }
     }
 
     public void mostrarViajesRentables() {
-        ArrayList<Viajes> resultado = obtenerViajesRentables();
-        System.out.println("=== VIAJES RENTABLES ===");
-        if (resultado.isEmpty()) {
-            System.out.println("No hay viajes que cumplan el criterio de rentabilidad.");
+        ArrayList<Viajes> rentables = obtenerViajesRentables();
+
+        if (rentables.isEmpty()) {
+            System.out.println("No hay viajes rentables.");
             return;
         }
-        for (Viajes viaje : resultado) System.out.println(viaje + " | Ganancia estimada por bus con pasajeros: criterio cumplido");
+
+        for (Viajes viaje : rentables) {
+            System.out.println(viaje);
+        }
     }
 
-    public String buscarBusTexto(int id) {
-        try { return buscarBus(id).toString(); }
-        catch (ElementoNoEncontradoException e) { return e.getMessage(); }
+    public String listarBusesTexto() {
+        ArrayList<Buses> buses = obtenerBusesUnicos();
+
+        if (buses.isEmpty()) {
+            return "No hay buses registrados.";
+        }
+
+        StringBuilder texto = new StringBuilder();
+
+        for (Buses bus : buses) {
+            texto.append(bus).append(System.lineSeparator());
+        }
+
+        return texto.toString();
     }
 
-    public String buscarViajeTexto(int id) {
-        try { return buscarViaje(id).toString(); }
-        catch (ElementoNoEncontradoException e) { return e.getMessage(); }
+    public String listarViajesTexto() {
+        if (listaViajes.isEmpty()) {
+            return "No hay viajes registrados.";
+        }
+
+        StringBuilder texto = new StringBuilder();
+
+        for (Viajes viaje : listaViajes) {
+            texto.append(viaje).append(System.lineSeparator());
+        }
+
+        return texto.toString();
     }
+
+    public void guardarEnArchivo(String ruta) throws IOException {
+        guardarCambios(ruta);
+    }
+
+    public String buscarBusTexto(int id) throws ElementoNoEncontradoException {
+        return buscarBus(id).toString();
+    }
+
+    public Pasajeros buscarPasajero(String nombre) throws ElementoNoEncontradoException {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new ElementoNoEncontradoException("El nombre no puede estar vacío.");
+        }
+
+        for (Viajes viaje : listaViajes) {
+            for (int i = 0; i < viaje.getCantidadBuses(); i++) {
+                Buses bus = viaje.obtenerBusPorPosicion(i);
+
+                for (int j = 0; j < bus.getCantidadPasajeros(); j++) {
+                    Pasajeros pasajero = bus.obtenerPasajero(j);
+
+                    if (pasajero.getNombre().equalsIgnoreCase(nombre.trim())) {
+                        return pasajero;
+                    }
+                }
+            }
+        }
+
+        throw new ElementoNoEncontradoException("No existe un pasajero con el nombre " + nombre + ".");
+    }
+
+
 }
-    
+
