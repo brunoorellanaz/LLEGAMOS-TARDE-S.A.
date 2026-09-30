@@ -737,4 +737,25 @@ public class gestionbuses {
 
         throw new ElementoNoEncontradoException("No existe un pasajero con el nombre " + nombre + ".");
     }
+    //Esto evita que un bus esté en dos viajes al mismo tiempo, ya que esto nbo se permite
+    private boolean busDisponible(int idBus, LocalDateTime inicioNuevo, int duracionNuevo) {
+
+        LocalDateTime finNuevo = inicioNuevo.plusMinutes(duracionNuevo);
+
+        for (Viajes viaje : listaViajes) {
+
+            // Si este viaje utiliza el bus que queremos asignar
+            if (viaje.tieneBus(idBus)) {
+
+                LocalDateTime inicioExistente = viaje.getFechaHoraInicio();
+                LocalDateTime finExistente = viaje.getFechaHoraFin();
+
+                // Comprobar si los horarios se solapan
+                boolean seSolapan = inicioNuevo.isBefore(finExistente) && finNuevo.isAfter(inicioExistente);
+
+                if (seSolapan) return false;  
+            }
+        }
+        return true;
+    }
 }
