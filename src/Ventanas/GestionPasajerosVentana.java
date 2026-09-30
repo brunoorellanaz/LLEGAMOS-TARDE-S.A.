@@ -183,7 +183,9 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
 
         } catch (NumberFormatException e) {
 	    JOptionPane.showMessageDialog(this, "El ID y la edad deben ser números.", "Error", JOptionPane.ERROR_MESSAGE);
-	}
+	} catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_addPasajeroActionPerformed
 
     private void backMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backMenuActionPerformed

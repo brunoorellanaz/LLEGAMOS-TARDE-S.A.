@@ -190,11 +190,13 @@ public class GestionBusesVentana extends javax.swing.JFrame {
         try {
             String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del bus a modificar:");
             if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+            
+            int id = Integer.parseInt(idTexto);
+            gestion.buscarBus(id); //valida que el bus exista ANTES de pedir la nueva capacidad
 
             String capacidadTexto = JOptionPane.showInputDialog(this, "Ingrese la nueva capacidad");
-            if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+            if (capacidadTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-	    int id = Integer.parseInt(idTexto);
 	    int nuevaCapacidad = Integer.parseInt(capacidadTexto);
 
 	    gestion.modificarBus(id, nuevaCapacidad);

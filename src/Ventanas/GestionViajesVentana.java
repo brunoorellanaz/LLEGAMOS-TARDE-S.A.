@@ -231,6 +231,9 @@ public class GestionViajesVentana extends javax.swing.JFrame {
         String idTexto = JOptionPane.showInputDialog(this, "Ingrese ID del viaje a modificar:");
         if (idTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
+        int id = Integer.parseInt(idTexto);
+        gestion.buscarViaje(id); //valida que el viaje exista antes de pedir el resto de datos
+
 	String origen = JOptionPane.showInputDialog(this, "Ingrese el origen:");
         if (origen == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
@@ -249,15 +252,14 @@ public class GestionViajesVentana extends javax.swing.JFrame {
         String cantidadBusesTexto = JOptionPane.showInputDialog(this, "Ingrese cantidad de buses:");
         if (cantidadBusesTexto == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
-	    int id = Integer.parseInt(idTexto);
-	    double costoViaje = Double.parseDouble(costoViajeTexto);
-	    double costoPasaje = Double.parseDouble(costoPasajeTexto);
+	double costoViaje = Double.parseDouble(costoViajeTexto);
+	double costoPasaje = Double.parseDouble(costoPasajeTexto);
 
-	    LocalDateTime fechaHora = LocalDateTime.parse(fechaTexto,
-		java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+	LocalDateTime fechaHora = LocalDateTime.parse(fechaTexto,
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 	    
-	    gestion.modificarViaje(id, origen, destino, costoViaje, costoPasaje, fechaHora);
-	    JOptionPane.showMessageDialog(this, "Viaje modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+	gestion.modificarViaje(id, origen, destino, costoViaje, costoPasaje, fechaHora);
+	JOptionPane.showMessageDialog(this, "Viaje modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (ProcesoCanceladoException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Proceso cancelado", JOptionPane.INFORMATION_MESSAGE);
@@ -265,7 +267,9 @@ public class GestionViajesVentana extends javax.swing.JFrame {
 	} catch(DateTimeParseException e) {
 	    JOptionPane.showMessageDialog(this, "La fecha debe tener el formato dd/MM/yyyy HH:mm", "Error", JOptionPane.ERROR_MESSAGE);
 
-	} catch(ElementoNoEncontradoException e) {
+	} catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El costo debe ser un numero", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch(ElementoNoEncontradoException e) {
 	    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
 	} catch(IllegalArgumentException e) {
