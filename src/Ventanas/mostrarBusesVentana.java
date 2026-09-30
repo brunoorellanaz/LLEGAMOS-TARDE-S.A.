@@ -57,7 +57,7 @@ public class mostrarBusesVentana extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID ", "Capacidad", "Title 3"
+                "ID ", "Capacidad", "Disponibilidad"
             }
         ));
         jScrollPane1.setViewportView(tablaBuses);
