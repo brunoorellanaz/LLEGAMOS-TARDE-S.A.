@@ -737,7 +737,4 @@ public class gestionbuses {
 
         throw new ElementoNoEncontradoException("No existe un pasajero con el nombre " + nombre + ".");
     }
-
-
 }
-

@@ -47,8 +47,8 @@ public class Buses {
             throw new IllegalArgumentException("El pasajero no puede ser nulo.");
         }
 
-        if (pasajeros.size() >= capacity) {
-            disponibility = false;
+        if (pasajeros.size() >= capacity || !disponibility) {
+            setDisponibility(false);
             throw new CapacidadExcedidaException("El bus " + id_bus + " no tiene asientos disponibles.");
         }
 

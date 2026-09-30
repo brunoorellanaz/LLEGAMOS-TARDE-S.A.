@@ -16,6 +16,7 @@ public class mostrarBusesVentana extends javax.swing.JFrame {
     /**
      * Creates new form mostrarBusesVentana
      */
+
     public mostrarBusesVentana(gestionbuses gestion, String archivo) {
         this.gestion = gestion;
         this.archivo = archivo;
@@ -35,7 +36,6 @@ public class mostrarBusesVentana extends javax.swing.JFrame {
             });
         }
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -138,7 +138,7 @@ public class mostrarBusesVentana extends javax.swing.JFrame {
 
             modeloTabla.addRow(new Object[]{
                 bus.getIdBus(),
-                bus.getCapacity(),
+                bus.getCantidadPasajeros() + "/" + bus.getCapacity(),
                 bus.getDisponibility()
             });
 
