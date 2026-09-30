@@ -26,13 +26,15 @@ public class mostrarPasajerosVentana extends javax.swing.JFrame {
     private  void cargarPasajeros(){
         DefaultTableModel modeloTabla = (DefaultTableModel) jTable1.getModel();
         System.out.println("Cantidad de pasajeros: " + gestion.getCantidadPasajeros());
+        modeloTabla.addColumn("Tipo");
         for (int i = 0; i < gestion.getCantidadPasajeros(); i++){
             Pasajeros pasajero = gestion.obtenerPasajero(i);
             modeloTabla.addRow(new Object[]{
                 pasajero.getIdPasajero(),
                 pasajero.getNombre(),
                 pasajero.getEdad(),
-                pasajero.getBus()
+                pasajero.getBus(),
+                pasajero.getTipo()
             });
             
         }
@@ -149,7 +151,8 @@ public class mostrarPasajerosVentana extends javax.swing.JFrame {
                 pasajero.getIdPasajero(),
                 pasajero.getNombre(),
                 pasajero.getEdad(),
-                pasajero.getBus()
+                pasajero.getBus(),
+                pasajero.getTipo()
             });
 
         } catch (NumberFormatException e) {

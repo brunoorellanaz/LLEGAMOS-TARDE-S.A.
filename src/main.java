@@ -18,6 +18,15 @@ public class main {
             gestion.cargarDatosIniciales();
         }
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                gestion.guardarEnArchivo(ARCHIVO);
+            } catch (Exception e) {
+                System.out.println("No se pudieron guardar los datos al salir: " +
+                    e.getMessage());
+            }
+        }));
+
         System.out.println("========================================");
         System.out.println(" SISTEMA DE INFORMACIÓN - SIA");
         System.out.println("========================================");
@@ -95,7 +104,10 @@ public class main {
         System.out.print("Origen: "); String origen = s.nextLine();
         System.out.print("Destino: "); String destino = s.nextLine();
         System.out.print("Fecha y hora (dd/MM/yyyy HH:mm): "); String fecha = s.nextLine();
-        g.reservarViaje(id, nombre, edad, origen, destino, fecha);
+        System.out.print("Tipo (1 = Normal, 2 = Estudiante, 3 = Adulto Mayor): ");
+        String t = s.nextLine().trim();
+        String tipo = t.equals("2") ? "Estudiante" : (t.equals("3") ? "AdultoMayor" : "Normal");
+        g.reservarViaje(id, nombre, edad, origen, destino, fecha, tipo);
     }
 
     private static void menuBuses(Scanner s, gestionbuses g) {

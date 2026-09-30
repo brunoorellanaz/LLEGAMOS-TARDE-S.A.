@@ -67,7 +67,16 @@ public class CargarDatos {
                             throw new IOException("Registro PASAJERO incompleto.");
                         }
 
-                        Pasajeros pasajero = new Pasajeros(Integer.parseInt(c[1]), Integer.parseInt(c[3]), c[2]);
+                        String tipoPasajero = (c.length > 6) ? c[6] : "Normal";
+                        Pasajeros pasajero;
+                        
+                        if ("Estudiante".equalsIgnoreCase(tipoPasajero)) {
+                            pasajero = new PasajeroEstudiante(Integer.parseInt(c[1]), Integer.parseInt(c[3]), c[2]);
+                        } else if ("AdultoMayor".equalsIgnoreCase(tipoPasajero)) {
+                            pasajero = new PasajeroAdultoMayor(Integer.parseInt(c[1]), Integer.parseInt(c[3]), c[2]);
+                        } else {
+                            pasajero = new Pasajeros(Integer.parseInt(c[1]), Integer.parseInt(c[3]), c[2]);
+                        }
 
                         int pasajeroViajeId = Integer.parseInt(c[4]);
                         int pasajeroBusId = Integer.parseInt(c[5]);

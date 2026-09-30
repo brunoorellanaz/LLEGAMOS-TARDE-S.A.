@@ -26,7 +26,7 @@ public class GuardarDatos {
                     for (int k = 0; k < bus.getCantidadPasajeros(); k++) {
                         Pasajeros pasajero = bus.obtenerPasajero(k);
 
-                        escritor.write("PASAJERO;" + pasajero.getIdPasajero() + ";" + limpiar(pasajero.getNombre()) + ";" + pasajero.getEdad() + ";" + viaje.getIdViaje() + ";" + bus.getIdBus());
+                        escritor.write("PASAJERO;" + pasajero.getIdPasajero() + ";" + limpiar(pasajero.getNombre()) + ";" + pasajero.getEdad() + ";" + viaje.getIdViaje() + ";" + bus.getIdBus() + ";" + pasajero.getTipo());
                         escritor.newLine();
                     }
                 }

@@ -355,6 +355,10 @@ public class gestionbuses {
     // ============================================================
 
     public boolean reservarViaje(int idPasajero, String nombre, int edad, String origen, String destino, String fechaHora) {
+        return reservarViaje(idPasajero, nombre, edad, origen, destino, fechaHora, "Normal");
+    }
+
+    public boolean reservarViaje(int idPasajero, String nombre, int edad, String origen, String destino, String fechaHora, String tipo) {
         if (idPasajero <= 0) {
             throw new IllegalArgumentException("El ID del pasajero debe ser positivo.");
         }
@@ -421,7 +425,14 @@ public class gestionbuses {
         }
 
         try {
-            Pasajeros pasajero = new Pasajeros(idPasajero, edad, nombre);
+            Pasajeros pasajero;
+            if ("Estudiante".equalsIgnoreCase(tipo)) {
+                pasajero = new PasajeroEstudiante(idPasajero, edad, nombre);
+            } else if ("AdultoMayor".equalsIgnoreCase(tipo)) {
+                pasajero = new PasajeroAdultoMayor(idPasajero, edad, nombre);
+            } else {
+                pasajero = new Pasajeros(idPasajero, edad, nombre);
+            }
             bus.agregarPasajero(pasajero);
             return true;
         } catch (CapacidadExcedidaException e) {

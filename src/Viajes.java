@@ -164,7 +164,14 @@ public class Viajes {
     }
 
     public boolean esRentable(Buses bus) {
-        return bus != null && bus.getCantidadPasajeros() * costoPasaje > costoViaje;
+        if (bus == null) return false;
+        //cada pasajero paga según su tipo al usar sobreescritura de factorTarifa
+        double ingresos = 0.0;
+        for (int i = 0 ; i < bus.getCantidadPasajeros(); i++) {
+            Pasajeros p = bus.obtenerPasajero(i);
+            ingresos += costoPasaje * p.factorTarifa();
+        }
+        return ingresos > costoViaje;
     }
 
     public void reasignarBus(Buses bus) {

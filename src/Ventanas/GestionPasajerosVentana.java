@@ -163,6 +163,11 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
             String fechaHora = JOptionPane.showInputDialog(this, "Ingrese fecha y hora (dd/MM/yyyy HH:mm):" );
             if (fechaHora == null) throw new ProcesoCanceladoException("Proceso Cancelado");
 
+            String[] tipos = {"Normal", "Estudiante", "AdultoMayor"};
+            String tipo = (String) JOptionPane.showInputDialog(this, "Tipo de pasajero:", "Tipo",
+                                   JOptionPane.QUESTION_MESSAGE, null, tipos, tipos[0]);
+            if (tipo == null) throw new ProcesoCanceladoException("Proceso Cancelado");
+            
 	    int id = Integer.parseInt(idTexto);
 	    int edad = Integer.parseInt(edadTexto);
 
@@ -172,7 +177,8 @@ public class GestionPasajerosVentana extends javax.swing.JFrame {
                 edad,
                 origen,
                 destino,
-                fechaHora
+                fechaHora,
+                tipo
             );
         
             if (resultado) JOptionPane.showMessageDialog(this, "Pasajero agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);

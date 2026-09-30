@@ -43,6 +43,16 @@ public class Pasajeros {
         return nombre;
     }
 
+    //método propio 1 para poder sobreescribirlo en las subclases (1.0 = tarifa completa)
+    public double factorTarifa() {
+        return 1.0;
+    }
+    
+    //método propio 2 para poder sobreescribirlo en las subclases. Tipo de pasajero
+    public String getTipo() {
+        return "Normal";
+    }
+
     @Override
     public String toString() {
         return "ID: " + id_pasajero + " | Nombre: " + nombre + " | Edad: " + edad + " | Bus: " + (bus == null ? "Sin asignar" : bus.getIdBus());
