@@ -440,27 +440,21 @@ public class gestionbuses {
     // VIAJES RENTABLES
     // ============================================================
 
-    public ArrayList<Viajes> obtenerViajesRentables() {
-        ArrayList<Viajes> rentables = new ArrayList<>();
-
+    public String reporteViajesRentables() {
+        StringBuilder sb = new StringBuilder();
         for (Viajes viaje : listaViajes) {
-            boolean rentable = false;
-
-            for (int i = 0; i < viaje.getCantidadBuses(); i++) {
+            for (int i = 0 ; i < viaje.getCantidadBuses() ; i++) {
                 Buses bus = viaje.obtenerBusPorPosicion(i);
-
                 if (viaje.esRentable(bus)) {
-                    rentable = true;
+                    sb.append(viaje).append("\n");
                     break;
                 }
             }
-
-            if (rentable) {
-                rentables.add(viaje);
-            }
         }
-
-        return rentables;
+        if (sb.length() == 0) {
+            return "No hay viajes que cumplan el criterio de rentabilidad.";
+        }
+        return sb.toString();
     }
 
     // ============================================================
@@ -673,16 +667,7 @@ public class gestionbuses {
     }
 
     public void mostrarViajesRentables() {
-        ArrayList<Viajes> rentables = obtenerViajesRentables();
-
-        if (rentables.isEmpty()) {
-            System.out.println("No hay viajes rentables.");
-            return;
-        }
-
-        for (Viajes viaje : rentables) {
-            System.out.println(viaje);
-        }
+        System.out.println(reporteViajesRentables());
     }
 
     public String listarBusesTexto() {

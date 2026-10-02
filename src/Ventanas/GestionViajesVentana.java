@@ -11,7 +11,6 @@
 import javax.swing.JOptionPane;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 
 public class GestionViajesVentana extends javax.swing.JFrame {
     private gestionbuses gestion;
@@ -278,20 +277,7 @@ public class GestionViajesVentana extends javax.swing.JFrame {
     }
 
     private void viajesRentablesActionPerformed(java.awt.event.ActionEvent evt) {
-	ArrayList<Viajes> rentables = gestion.obtenerViajesRentables();
-
-	if (rentables.isEmpty()) {
-	    JOptionPane.showMessageDialog(this, "No hay viajes que cumplan el criterio de rentabilidad.", "Viajes rentables",
-		JOptionPane.INFORMATION_MESSAGE);
-	    return;
-	}
-
-	StringBuilder sb = new StringBuilder();
-	for (Viajes viaje : rentables) {
-	    sb.append(viaje).append("\n");
-	}
-
-	JOptionPane.showMessageDialog(this, sb.toString(), "Viajes rentables", JOptionPane.INFORMATION_MESSAGE);
+	JOptionPane.showMessageDialog(this, gestion.reporteViajesRentables(), "Viajes rentables", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
