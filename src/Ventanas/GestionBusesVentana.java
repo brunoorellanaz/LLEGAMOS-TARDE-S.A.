@@ -140,7 +140,7 @@ public class GestionBusesVentana extends javax.swing.JFrame {
                 int id = Integer.parseInt(idTexto);
                 int capacidad = Integer.parseInt(capacidadTexto);
 
-                gestion.agregarBus(id, capacidad);
+                gestion.verificarAgregacionBus(id, capacidad);
                 JOptionPane.showMessageDialog(this, "Bus agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         
         } catch (ProcesoCanceladoException e) {
@@ -162,7 +162,7 @@ public class GestionBusesVentana extends javax.swing.JFrame {
 
             int id = Integer.parseInt(idTexto);
 
-            gestion.eliminarBus(id);
+            gestion.verificarEliminacionBus(id);
             JOptionPane.showMessageDialog(this, "Bus eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (ProcesoCanceladoException e) {
@@ -199,7 +199,7 @@ public class GestionBusesVentana extends javax.swing.JFrame {
 
 	    int nuevaCapacidad = Integer.parseInt(capacidadTexto);
 
-	    gestion.modificarBus(id, nuevaCapacidad);
+	    gestion.verificarModificacionBus(id, nuevaCapacidad);
 	    JOptionPane.showMessageDialog(this, "Bus modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (ProcesoCanceladoException e) {

@@ -121,7 +121,7 @@ public class gestionbuses {
     // GESTION DE BUSES
     // ============================================================
 
-    public void agregarBus(int id, int capacidad) {
+    public void verificarAgregacionBus(int id, int capacidad) {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID del bus debe ser positivo.");
         }
@@ -149,7 +149,7 @@ public class gestionbuses {
         }
     }
 
-    public void eliminarBus(int id) throws ElementoNoEncontradoException {
+    public void verificarEliminacionBus(int id) throws ElementoNoEncontradoException {
         Buses bus = buscarBusSinExcepcion(id);
 
         if (bus == null) {
@@ -174,7 +174,7 @@ public class gestionbuses {
         }
     }
 
-    public void modificarBus(int id, int nuevaCapacidad) throws ElementoNoEncontradoException {
+    public void verificarModificacionBus(int id, int nuevaCapacidad) throws ElementoNoEncontradoException {
         if (nuevaCapacidad <= 0) {
             throw new IllegalArgumentException("La capacidad debe ser mayor que cero.");
         }
