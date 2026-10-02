@@ -20,10 +20,6 @@ public class gestionbuses {
         archivo = ruta;
     }
 
-    public ArrayList<Viajes> getListaViajes() {
-        return listaViajes;
-    }
-
     public int getCantidadViajes() {
         return listaViajes.size();
     }

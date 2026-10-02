@@ -77,10 +77,6 @@ public class Buses {
         return pasajeros.get(posicion);
     }
 
-    public ArrayList<Pasajeros> getPasajeros() {
-        return pasajeros;
-    }
-
     public void mostrarPasajeros() {
         if (pasajeros.isEmpty()) {
             System.out.println("El bus no tiene pasajeros.");
