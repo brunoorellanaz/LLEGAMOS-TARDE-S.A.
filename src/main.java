@@ -28,7 +28,7 @@ public class main {
         }));
 
         System.out.println("========================================");
-        System.out.println(" SISTEMA DE INFORMACIÓN - SIA");
+        System.out.println(" LLEGAMOS TARDE S.A.");
         System.out.println("========================================");
         System.out.println("1. Consola");
         System.out.println("2. Ventanas");
@@ -127,15 +127,15 @@ public class main {
                     case "1":
                         System.out.print("ID: "); int id = Integer.parseInt(s.nextLine());
                         System.out.print("Capacidad: "); int cap = Integer.parseInt(s.nextLine());
-                        g.agregarBus(id, cap); System.out.println("Bus agregado."); break;
+                        g.verificarAgregacionBus(id, cap); System.out.println("Bus agregado."); break;
                     case "2": System.out.println(g.listarBusesTexto()); break;
                     case "3":
                         System.out.print("ID: "); id = Integer.parseInt(s.nextLine());
                         System.out.print("Nueva capacidad: "); cap = Integer.parseInt(s.nextLine());
-                        g.modificarBus(id, cap); System.out.println("Bus modificado."); break;
+                        g.verificarModificacionBus(id, cap); System.out.println("Bus modificado."); break;
                     case "4":
                         System.out.print("ID: "); id = Integer.parseInt(s.nextLine());
-                        g.eliminarBus(id); System.out.println("Bus eliminado."); break;
+                        g.verificarEliminacionBus(id); System.out.println("Bus eliminado."); break;
                     case "5":
                         System.out.print("ID: "); id = Integer.parseInt(s.nextLine());
                         System.out.println(g.buscarBusTexto(id)); break;
